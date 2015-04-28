@@ -1,6 +1,6 @@
 //
-//  STHTTPRequest.m
-//  STHTTPRequest
+//  HMHTTPRequest.m
+//  HMHTTPRequest
 //
 //  Created by Nicolas Seriot on 07.11.11.
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
@@ -12,20 +12,20 @@
 #error This file must be compiled with ARC. Either turn on ARC for the project or use -fobjc-arc flag
 #endif
 
-#import "STHTTPRequest.h"
+#import "HMHTTPRequest.h"
 
-NSUInteger const kSTHTTPRequestCancellationError = 1;
-NSUInteger const kSTHTTPRequestDefaultTimeout = 30;
+NSUInteger const kHMHTTPRequestCancellationError = 1;
+NSUInteger const kHMHTTPRequestDefaultTimeout = 30;
 
 static NSMutableDictionary *localCredentialsStorage = nil;
 static NSMutableArray *localCookiesStorage = nil;
 
 static BOOL globalIgnoreCache = NO;
-static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCookiesStorageShared;
+static HMHTTPRequestCookiesStorage globalCookiesStoragePolicy = HMHTTPRequestCookiesStorageShared;
 
 /**/
 
-@interface STHTTPRequestFileUpload : NSObject
+@interface HMHTTPRequestFileUpload : NSObject
 @property (nonatomic, retain) NSString *path;
 @property (nonatomic, retain) NSString *parameterName;
 @property (nonatomic, retain) NSString *mimeType;
@@ -34,7 +34,7 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 + (instancetype)fileUploadWithPath:(NSString *)path parameterName:(NSString *)parameterName;
 @end
 
-@interface STHTTPRequestDataUpload : NSObject
+@interface HMHTTPRequestDataUpload : NSObject
 @property (nonatomic, retain) NSData *data;
 @property (nonatomic, retain) NSString *parameterName;
 @property (nonatomic, retain) NSString *mimeType; // can be nil
@@ -44,7 +44,7 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 
 /**/
 
-@interface STHTTPRequest ()
+@interface HMHTTPRequest ()
 
 @property (nonatomic) NSInteger responseStatus;
 @property (nonatomic, strong) NSURLConnection *connection;
@@ -53,8 +53,8 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 @property (nonatomic, strong) NSDictionary *responseHeaders;
 @property (nonatomic, strong) NSURL *url;
 @property (nonatomic, strong) NSError *error;
-@property (nonatomic, strong) NSMutableArray *filesToUpload; // STHTTPRequestFileUpload instances
-@property (nonatomic, strong) NSMutableArray *dataToUpload; // STHTTPRequestDataUpload instances
+@property (nonatomic, strong) NSMutableArray *filesToUpload; // HMHTTPRequestFileUpload instances
+@property (nonatomic, strong) NSMutableArray *dataToUpload; // HMHTTPRequestDataUpload instances
 @property (nonatomic, strong) NSURLRequest *request;
 @end
 
@@ -62,16 +62,16 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 - (NSString *)base64Encoding; // private API
 @end
 
-@implementation STHTTPRequest
+@implementation HMHTTPRequest
 
 #pragma mark Initializers
 
-+ (STHTTPRequest *)requestWithURL:(NSURL *)url {
++ (HMHTTPRequest *)requestWithURL:(NSURL *)url {
     if(url == nil) return nil;
-    return [(STHTTPRequest *)[self alloc] initWithURL:url];
+    return [(HMHTTPRequest *)[self alloc] initWithURL:url];
 }
 
-+ (STHTTPRequest *)requestWithURLString:(NSString *)urlString {
++ (HMHTTPRequest *)requestWithURLString:(NSString *)urlString {
     NSURL *url = [NSURL URLWithString:urlString];
     return [self requestWithURL:url];
 }
@@ -80,11 +80,11 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
     globalIgnoreCache = ignoreCache;
 }
 
-+ (void)setGlobalCookiesStoragePolicy:(STHTTPRequestCookiesStorage)cookieStoragePolicy {
++ (void)setGlobalCookiesStoragePolicy:(HMHTTPRequestCookiesStorage)cookieStoragePolicy {
     globalCookiesStoragePolicy = cookieStoragePolicy;
 }
 
-- (STHTTPRequest *)initWithURL:(NSURL *)theURL {
+- (HMHTTPRequest *)initWithURL:(NSURL *)theURL {
     
     if (self = [super init]) {
         self.url = theURL;
@@ -93,11 +93,11 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
         self.POSTDataEncoding = NSUTF8StringEncoding;
         self.encodePOSTDictionary = YES;
         self.addCredentialsToURL = NO;
-        self.timeoutSeconds = kSTHTTPRequestDefaultTimeout;
+        self.timeoutSeconds = kHMHTTPRequestDefaultTimeout;
         self.filesToUpload = [NSMutableArray array];
         self.dataToUpload = [NSMutableArray array];
         self.HTTPMethod = @"GET"; // default
-        self.cookieStoragePolicyForInstance = STHTTPRequestCookiesStorageUndefined; // globalCookiesStoragePolicy will be used
+        self.cookieStoragePolicyForInstance = HMHTTPRequestCookiesStorageUndefined; // globalCookiesStoragePolicy will be used
     }
     
     return self;
@@ -155,8 +155,8 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 
 #pragma mark Cookies
 
-- (STHTTPRequestCookiesStorage)cookieStoragePolicy {
-    if(_cookieStoragePolicyForInstance != STHTTPRequestCookiesStorageUndefined) {
+- (HMHTTPRequestCookiesStorage)cookieStoragePolicy {
+    if(_cookieStoragePolicyForInstance != HMHTTPRequestCookiesStorageUndefined) {
         return _cookieStoragePolicyForInstance;
     }
     
@@ -185,9 +185,9 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
     
     NSArray *allCookies = nil;
     
-    if([self cookieStoragePolicy] == STHTTPRequestCookiesStorageShared) {
+    if([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageShared) {
         allCookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
-    } else if ([self cookieStoragePolicy] == STHTTPRequestCookiesStorageLocal) {
+    } else if ([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageLocal) {
         allCookies = [[self class] localCookiesStorage];
     }
     
@@ -202,9 +202,9 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 - (void)deleteSessionCookies {
     
     for(NSHTTPCookie *cookie in [self sessionCookies]) {
-        if([self cookieStoragePolicy] == STHTTPRequestCookiesStorageShared) {
+        if([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageShared) {
             [[NSHTTPCookieStorage sharedHTTPCookieStorage] deleteCookie:cookie];
-        } else if ([self cookieStoragePolicy] == STHTTPRequestCookiesStorageLocal) {
+        } else if ([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageLocal) {
             [[[self class] localCookiesStorage] removeObject:cookie];
         }
     }
@@ -223,9 +223,9 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 }
 
 - (void)deleteAllCookies {
-    if([self cookieStoragePolicy] == STHTTPRequestCookiesStorageShared) {
+    if([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageShared) {
         [[self class] deleteAllCookiesFromSharedCookieStorage];
-    } else if ([self cookieStoragePolicy] == STHTTPRequestCookiesStorageLocal) {
+    } else if ([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageLocal) {
         [[[self class] localCookiesStorage] removeAllObjects];
     }
 }
@@ -244,9 +244,9 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
     NSParameterAssert(cookie);
     if(cookie == nil) return;
     
-    if([self cookieStoragePolicy] == STHTTPRequestCookiesStorageShared) {
+    if([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageShared) {
         [[self class] addCookieToSharedCookiesStorage:cookie];
-    } else if ([self cookieStoragePolicy] == STHTTPRequestCookiesStorageLocal) {
+    } else if ([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageLocal) {
         [[[self class] localCookiesStorage] addObject:cookie];
     } // else don't store anything
 }
@@ -284,9 +284,9 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 
 - (NSArray *)requestCookies {
     
-    if([self cookieStoragePolicy] == STHTTPRequestCookiesStorageShared) {
+    if([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageShared) {
         return [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:[_url absoluteURL]];
-    } else if ([self cookieStoragePolicy] == STHTTPRequestCookiesStorageLocal) {
+    } else if ([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageLocal) {
         NSArray *filteredCookies = [[[self class] localCookiesStorage] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
             NSHTTPCookie *cookie = (NSHTTPCookie *)evaluatedObject;
             return [[cookie domain] isEqualToString:[self.url host]];
@@ -376,7 +376,7 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 + (NSURL *)appendURL:(NSURL *)url withGETParameters:(NSDictionary *)parameters {
     NSMutableString *urlString = [[NSMutableString alloc] initWithString:[url absoluteString]];
     
-    NSString *s = [urlString st_stringByAppendingGETParameters:parameters];
+    NSString *s = [urlString hm_stringByAppendingGETParameters:parameters];
     
     return [NSURL URLWithString:s];
 }
@@ -413,7 +413,7 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
         request.timeoutInterval = self.timeoutSeconds;
     }
     
-    if([self cookieStoragePolicy] == STHTTPRequestCookiesStorageShared || [self cookieStoragePolicy] == STHTTPRequestCookiesStorageLocal) {
+    if([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageShared || [self cookieStoragePolicy] == HMHTTPRequestCookiesStorageLocal) {
         NSArray *cookies = [self sessionCookies];
         NSDictionary *d = [NSHTTPCookie requestHeaderFieldsWithCookies:cookies];
         [request setAllHTTPHeaderFields:d];
@@ -423,8 +423,8 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
     if(_encodePOSTDictionary) {
         NSMutableDictionary *escapedPOSTDictionary = _POSTDictionary ? [NSMutableDictionary dictionary] : nil;
         [_POSTDictionary enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-            NSString *k = [key st_stringByAddingRFC3986PercentEscapesUsingEncoding:self.POSTDataEncoding];
-            NSString *v = [[obj description] st_stringByAddingRFC3986PercentEscapesUsingEncoding:self.POSTDataEncoding];
+            NSString *k = [key hm_stringByAddingRFC3986PercentEscapesUsingEncoding:self.POSTDataEncoding];
+            NSString *v = [[obj description] hm_stringByAddingRFC3986PercentEscapesUsingEncoding:self.POSTDataEncoding];
             [escapedPOSTDictionary setValue:v forKey:k];
         }];
         self.POSTDictionary = escapedPOSTDictionary;
@@ -435,7 +435,7 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
     
     if([self.filesToUpload count] > 0 || [self.dataToUpload count] > 0) {
         
-        NSString *boundary = @"----------kStHtTpReQuEsTbOuNdArY";
+        NSString *boundary = @"----------kHMHTTPRequestbOuNdArY";
         
         NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@", boundary];
         [request addValue:contentType forHTTPHeaderField:@"Content-Type"];
@@ -444,7 +444,7 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
         
         /**/
         
-        for(STHTTPRequestFileUpload *fileToUpload in self.filesToUpload) {
+        for(HMHTTPRequestFileUpload *fileToUpload in self.filesToUpload) {
             
             NSData *data = [NSData dataWithContentsOfFile:fileToUpload.path];
             if(data == nil) continue;
@@ -460,7 +460,7 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
         
         /**/
         
-        for(STHTTPRequestDataUpload *dataToUpload in self.dataToUpload) {
+        for(HMHTTPRequestDataUpload *dataToUpload in self.dataToUpload) {
             NSData *multipartData = [[self class] multipartContentWithBoundary:boundary
                                                                           data:dataToUpload.data
                                                                       fileName:dataToUpload.fileName
@@ -539,7 +539,7 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
         [request addValue:authValue forHTTPHeaderField:@"Authorization"];
     }
     
-    request.HTTPShouldHandleCookies = ([self cookieStoragePolicy] == STHTTPRequestCookiesStorageShared);
+    request.HTTPShouldHandleCookies = ([self cookieStoragePolicy] == HMHTTPRequestCookiesStorageShared);
     
     return request;
 }
@@ -548,17 +548,17 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 
 - (void)addFileToUpload:(NSString *)path parameterName:(NSString *)parameterName {
     
-    STHTTPRequestFileUpload *fu = [STHTTPRequestFileUpload fileUploadWithPath:path parameterName:parameterName];
+    HMHTTPRequestFileUpload *fu = [HMHTTPRequestFileUpload fileUploadWithPath:path parameterName:parameterName];
     [self.filesToUpload addObject:fu];
 }
 
 - (void)addDataToUpload:(NSData *)data parameterName:(NSString *)param {
-    STHTTPRequestDataUpload *du = [STHTTPRequestDataUpload dataUploadWithData:data parameterName:param mimeType:nil fileName:nil];
+    HMHTTPRequestDataUpload *du = [HMHTTPRequestDataUpload dataUploadWithData:data parameterName:param mimeType:nil fileName:nil];
     [self.dataToUpload addObject:du];
 }
 
 - (void)addDataToUpload:(NSData *)data parameterName:(NSString *)param mimeType:(NSString *)mimeType fileName:(NSString *)fileName {
-    STHTTPRequestDataUpload *du = [STHTTPRequestDataUpload dataUploadWithData:data parameterName:param mimeType:mimeType fileName:fileName];
+    HMHTTPRequestDataUpload *du = [HMHTTPRequestDataUpload dataUploadWithData:data parameterName:param mimeType:mimeType fileName:fileName];
     [self.dataToUpload addObject:du];
 }
 
@@ -702,7 +702,7 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
     
     // -F "coolfiles=@fil1.gif;type=image/gif,fil2.txt,fil3.html"   // file upload
     
-    for(STHTTPRequestFileUpload *f in _filesToUpload) {
+    for(HMHTTPRequestFileUpload *f in _filesToUpload) {
         NSString *s = [NSString stringWithFormat:@"%@=@%@", f.parameterName, f.path];
         [ma addObject:[NSString stringWithFormat:@"-F \"%@\"", s]];
     }
@@ -756,12 +756,12 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
         [ms appendFormat:@"\t %@ = %@\n", k, v];
     }
     
-    for(STHTTPRequestFileUpload *f in self.filesToUpload) {
+    for(HMHTTPRequestFileUpload *f in self.filesToUpload) {
         [ms appendString:@"UPLOAD FILE\n"];
         [ms appendFormat:@"\t %@ = %@\n", f.parameterName, f.path];
     }
     
-    for(STHTTPRequestDataUpload *d in self.dataToUpload) {
+    for(HMHTTPRequestDataUpload *d in self.dataToUpload) {
         [ms appendString:@"UPLOAD DATA\n"];
         [ms appendFormat:@"\t %@ = [%u bytes]\n", d.parameterName, (unsigned int)[d.data length]];
     }
@@ -788,8 +788,8 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
     
     /**/
     
-    BOOL showDebugDescription = [[NSUserDefaults standardUserDefaults] boolForKey:@"STHTTPRequestShowDebugDescription"];
-    BOOL showCurlDescription = [[NSUserDefaults standardUserDefaults] boolForKey:@"STHTTPRequestShowCurlDescription"];
+    BOOL showDebugDescription = [[NSUserDefaults standardUserDefaults] boolForKey:@"HMHTTPRequestShowDebugDescription"];
+    BOOL showCurlDescription = [[NSUserDefaults standardUserDefaults] boolForKey:@"HMHTTPRequestShowCurlDescription"];
     
     NSMutableString *logString = nil;
     
@@ -866,7 +866,7 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
     NSString *s = @"Connection was cancelled.";
     NSDictionary *userInfo = [NSDictionary dictionaryWithObject:s forKey:NSLocalizedDescriptionKey];
     self.error = [NSError errorWithDomain:NSStringFromClass([self class])
-                                     code:kSTHTTPRequestCancellationError
+                                     code:kHMHTTPRequestCancellationError
                                  userInfo:userInfo];
     
     self.errorBlock(self.error);
@@ -928,7 +928,7 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
         
         NSArray *responseCookies = [NSHTTPCookie cookiesWithResponseHeaderFields:_responseHeaders forURL:connection.currentRequest.URL];
         for(NSHTTPCookie *cookie in responseCookies) {
-            [self addCookie:cookie]; // won't store anything when STHTTPRequestCookiesStorageNoStorage
+            [self addCookie:cookie]; // won't store anything when HMHTTPRequestCookiesStorageNoStorage
         }
     }
     
@@ -972,25 +972,25 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 
 /**/
 
-@implementation NSError (STHTTPRequest)
+@implementation NSError (HMHTTPRequest)
 
-- (BOOL)st_isAuthenticationError {
+- (BOOL)hm_isAuthenticationError {
     
-    if ([[self domain] isEqualToString:@"STHTTPRequest"] && ([self code] == 401)) return YES;
+    if ([[self domain] isEqualToString:@"HMHTTPRequest"] && ([self code] == 401)) return YES;
     
     if ([[self domain] isEqualToString:NSURLErrorDomain] && ([self code] == kCFURLErrorUserCancelledAuthentication || [self code] == kCFURLErrorUserAuthenticationRequired)) return YES;
     
     return NO;
 }
 
-- (BOOL)st_isCancellationError {
-    return ([[self domain] isEqualToString:@"STHTTPRequest"] && [self code] == kSTHTTPRequestCancellationError);
+- (BOOL)hm_isCancellationError {
+    return ([[self domain] isEqualToString:@"HMHTTPRequest"] && [self code] == kHMHTTPRequestCancellationError);
 }
 
 @end
 
 @implementation NSString (RFC3986)
-- (NSString *)st_stringByAddingRFC3986PercentEscapesUsingEncoding:(NSStringEncoding)encoding {
+- (NSString *)hm_stringByAddingRFC3986PercentEscapesUsingEncoding:(NSStringEncoding)encoding {
     
     NSString *s = (__bridge_transfer NSString *)(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
                                                                                          (CFStringRef)self,
@@ -1005,13 +1005,13 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 
 @implementation NSString (STUtilities)
 
-- (NSString *)st_stringByAppendingGETParameters:(NSDictionary *)parameters {
+- (NSString *)hm_stringByAppendingGETParameters:(NSDictionary *)parameters {
     
     NSMutableString *ms = [self mutableCopy];
     
     __block BOOL questionMarkFound = NO;
     
-    NSArray *sortedParameters = [STHTTPRequest dictionariesSortedByKey:parameters];
+    NSArray *sortedParameters = [HMHTTPRequest dictionariesSortedByKey:parameters];
     
     [sortedParameters enumerateObjectsUsingBlock:^(NSDictionary *d, NSUInteger idx, BOOL *stop) {
         
@@ -1025,8 +1025,8 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
         [ms appendString: (questionMarkFound ? @"&" : @"?") ];
         
         [ms appendFormat:@"%@=%@",
-         [key st_stringByAddingRFC3986PercentEscapesUsingEncoding:NSUTF8StringEncoding],
-         [value st_stringByAddingRFC3986PercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+         [key hm_stringByAddingRFC3986PercentEscapesUsingEncoding:NSUTF8StringEncoding],
+         [value hm_stringByAddingRFC3986PercentEscapesUsingEncoding:NSUTF8StringEncoding]];
         
     }];
     
@@ -1049,10 +1049,10 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 
 /**/
 
-@implementation STHTTPRequestFileUpload
+@implementation HMHTTPRequestFileUpload
 
 + (instancetype)fileUploadWithPath:(NSString *)path parameterName:(NSString *)parameterName mimeType:(NSString *)mimeType {
-    STHTTPRequestFileUpload *fu = [[self alloc] init];
+    HMHTTPRequestFileUpload *fu = [[self alloc] init];
     fu.path = path;
     fu.parameterName = parameterName;
     fu.mimeType = mimeType;
@@ -1065,10 +1065,10 @@ static STHTTPRequestCookiesStorage globalCookiesStoragePolicy = STHTTPRequestCoo
 
 @end
 
-@implementation STHTTPRequestDataUpload
+@implementation HMHTTPRequestDataUpload
 
 + (instancetype)dataUploadWithData:(NSData *)data parameterName:(NSString *)parameterName mimeType:(NSString *)mimeType fileName:(NSString *)fileName {
-    STHTTPRequestDataUpload *du = [[self alloc] init];
+    HMHTTPRequestDataUpload *du = [[self alloc] init];
     du.data = data;
     du.parameterName = parameterName;
     du.mimeType = mimeType;

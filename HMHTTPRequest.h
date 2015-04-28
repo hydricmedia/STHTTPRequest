@@ -13,12 +13,12 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSUInteger const kSTHTTPRequestCancellationError;
-extern NSUInteger const kSTHTTPRequestDefaultTimeout;
+extern NSUInteger const kHMHTTPRequestCancellationError;
+extern NSUInteger const kHMHTTPRequestDefaultTimeout;
 
-@class STHTTPRequest;
+@class HMHTTPRequest;
 
-typedef void (^sendRequestBlock_t)(STHTTPRequest *request);
+typedef void (^sendRequestBlock_t)(HMHTTPRequest *request);
 typedef void (^uploadProgressBlock_t)(NSInteger bytesWritten, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite);
 typedef void (^downloadProgressBlock_t)(NSData *data, NSUInteger totalBytesReceived, long long totalBytesExpectedToReceive);
 typedef void (^completionBlock_t)(NSDictionary *headers, NSString *body);
@@ -26,13 +26,13 @@ typedef void (^completionDataBlock_t)(NSDictionary *headers, NSData *body);
 typedef void (^errorBlock_t)(NSError *error);
 
 typedef enum : NSUInteger {
-    STHTTPRequestCookiesStorageShared = 0,
-    STHTTPRequestCookiesStorageLocal = 1,
-    STHTTPRequestCookiesStorageNoStorage = 2,
-    STHTTPRequestCookiesStorageUndefined = NSUIntegerMax
-} STHTTPRequestCookiesStorage;
+    HMHTTPRequestCookiesStorageShared = 0,
+    HMHTTPRequestCookiesStorageLocal = 1,
+    HMHTTPRequestCookiesStorageNoStorage = 2,
+    HMHTTPRequestCookiesStorageUndefined = NSUIntegerMax
+} HMHTTPRequestCookiesStorage;
 
-@interface STHTTPRequest : NSObject <NSURLConnectionDelegate>
+@interface HMHTTPRequest : NSObject <NSURLConnectionDelegate>
 
 @property (copy) uploadProgressBlock_t uploadProgressBlock;
 @property (copy) downloadProgressBlock_t downloadProgressBlock;
@@ -52,7 +52,7 @@ typedef enum : NSUInteger {
 @property (nonatomic) BOOL encodePOSTDictionary; // default YES
 @property (nonatomic, strong, readonly) NSURL *url;
 @property (nonatomic) BOOL preventRedirections;
-@property (nonatomic) STHTTPRequestCookiesStorage cookieStoragePolicyForInstance; // overrides globalCookiesStoragePolicy
+@property (nonatomic) HMHTTPRequestCookiesStorage cookieStoragePolicyForInstance; // overrides globalCookiesStoragePolicy
 
 // response
 @property (nonatomic) NSStringEncoding forcedResponseEncoding;
@@ -67,13 +67,13 @@ typedef enum : NSUInteger {
 // cache
 @property (nonatomic) BOOL ignoreCache; // requests ignore cached responses and responses don't get cached
 
-+ (STHTTPRequest *)requestWithURL:(NSURL *)url;
-+ (STHTTPRequest *)requestWithURLString:(NSString *)urlString;
++ (HMHTTPRequest *)requestWithURL:(NSURL *)url;
++ (HMHTTPRequest *)requestWithURLString:(NSString *)urlString;
 
 + (void)setGlobalIgnoreCache:(BOOL)ignoreCache; // no cache at all when set, overrides the ignoreCache property
 
-- (NSString *)debugDescription; // logged when launched with -STHTTPRequestShowDebugDescription 1
-- (NSString *)curlDescription; // logged when launched with -STHTTPRequestShowCurlDescription 1
+- (NSString *)debugDescription; // logged when launched with -HMHTTPRequestShowDebugDescription 1
+- (NSString *)curlDescription; // logged when launched with -HMHTTPRequestShowCurlDescription 1
 
 - (NSString *)startSynchronousWithError:(NSError **)error;
 - (void)startAsynchronous;
@@ -90,7 +90,7 @@ typedef enum : NSUInteger {
 + (void)deleteAllCookiesFromSharedCookieStorage;
 + (void)deleteAllCookiesFromLocalCookieStorage;
 - (void)deleteSessionCookies; // empty the cookie storage that is used
-+ (void)setGlobalCookiesStoragePolicy:(STHTTPRequestCookiesStorage)cookieStoragePolicy;
++ (void)setGlobalCookiesStoragePolicy:(HMHTTPRequestCookiesStorage)cookieStoragePolicy;
 
 // Credentials
 + (NSURLCredential *)sessionAuthenticationCredentialsForURL:(NSURL *)requestURL;
@@ -113,19 +113,19 @@ typedef enum : NSUInteger {
 + (void)clearSession; // delete all credentials and cookies
 
 // DEBUG
-- (NSURLRequest *)prepareURLRequest; // prepare the request according to the STHTTPRequest instance state
+- (NSURLRequest *)prepareURLRequest; // prepare the request according to the HMHTTPRequest instance state
 
 @end
 
-@interface NSError (STHTTPRequest)
-- (BOOL)st_isAuthenticationError;
-- (BOOL)st_isCancellationError;
+@interface NSError (HMHTTPRequest)
+- (BOOL)hm_isAuthenticationError;
+- (BOOL)hm_isCancellationError;
 @end
 
 @interface NSString (RFC3986)
-- (NSString *)st_stringByAddingRFC3986PercentEscapesUsingEncoding:(NSStringEncoding)encoding;
+- (NSString *)hm_stringByAddingRFC3986PercentEscapesUsingEncoding:(NSStringEncoding)encoding;
 @end
 
 @interface NSString (STUtilities)
-- (NSString *)st_stringByAppendingGETParameters:(NSDictionary *)parameters;
+- (NSString *)hm_stringByAppendingGETParameters:(NSDictionary *)parameters;
 @end
