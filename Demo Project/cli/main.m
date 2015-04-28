@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "STHTTPRequest.h"
+#import "HMHTTPRequest.h"
 
 #define SYNCHRONOUS 0
 
@@ -17,12 +17,12 @@ int main(int argc, const char * argv[])
     @autoreleasepool {
 
 #if SYNCHRONOUS
-        STHTTPRequest *r = [STHTTPRequest requestWithURLString:@"http://perdu.com"];
+        HMHTTPRequest *r = [HMHTTPRequest requestWithURLString:@"http://perdu.com"];
         NSError *error = nil;
         [r startSynchronousWithError:&error];
         NSLog(@"--> %@", r.responseString);
 #else
-        STHTTPRequest *r = [STHTTPRequest requestWithURLString:@"http://perdu.com"];
+        HMHTTPRequest *r = [HMHTTPRequest requestWithURLString:@"http://perdu.com"];
         
         r.completionBlock = ^(NSDictionary *headers, NSString *body) {
             NSLog(@"-- %@", body);

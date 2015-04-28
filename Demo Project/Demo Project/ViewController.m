@@ -1,13 +1,13 @@
 //
 //  ViewController.m
-//  STHTTPRequestDemo
+//  HMHTTPRequestDemo
 //
 //  Created by Nicolas Seriot on 8/10/12.
 //  Copyright (c) 2012 Nicolas Seriot. All rights reserved.
 //
 
 #import "ViewController.h"
-#import "STHTTPRequest.h"
+#import "HMHTTPRequest.h"
 
 @implementation ViewController
 
@@ -20,11 +20,11 @@
     _headersTextView.text = @"";
     _imageView.image = nil;
     
-    __block STHTTPRequest *r = [STHTTPRequest requestWithURLString:@"https://raw.github.com/github/media/master/octocats/octocat.png"];
+    __block HMHTTPRequest *r = [HMHTTPRequest requestWithURLString:@"https://raw.github.com/github/media/master/octocats/octocat.png"];
 
 //    r.GETDictionary = @{@"a":@"1", @"b":@"x/x?!=&x"};
     
-    __weak STHTTPRequest *wr = r; // so that we can access the request from within the callback blocks but without creating a retain cycle
+    __weak HMHTTPRequest *wr = r; // so that we can access the request from within the callback blocks but without creating a retain cycle
     
     r.completionBlock = ^(NSDictionary *headers, NSString *body) {
         
@@ -39,7 +39,7 @@
     r.errorBlock = ^(NSError *error) {
         _statusLabel.text = [error localizedDescription];
         
-        NSLog(@"-- isCancellationError: %d", [error st_isCancellationError]);
+        NSLog(@"-- isCancellationError: %d", [error hm_isCancellationError]);
         
         _fetchButton.enabled = YES;
         [_activityIndicator stopAnimating];

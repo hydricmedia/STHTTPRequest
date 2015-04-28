@@ -1,6 +1,6 @@
 //
-//  STHTTPRequestDemoTests.m
-//  STHTTPRequestDemoTests
+//  HMHTTPRequestDemoTests.m
+//  HMHTTPRequestDemoTests
 //
 //  Created by Nicolas Seriot on 8/10/12.
 //  Copyright (c) 2012 Nicolas Seriot. All rights reserved.
@@ -8,31 +8,31 @@
 
 #import <XCTest/XCTest.h>
 
-#import "STHTTPRequest.h"
+#import "HMHTTPRequest.h"
 
-#import "STHTTPRequestTestResponse.h"
-#import "STHTTPRequestTestResponseQueue.h"
+#import "HMHTTPRequestTestResponse.h"
+#import "HMHTTPRequestTestResponseQueue.h"
 
-#import "STHTTPRequest+UnitTests.h"
+#import "HMHTTPRequest+UnitTests.h"
 
-@interface STHTTPRequestTests : XCTestCase
+@interface HMHTTPRequestTests : XCTestCase
 
 @end
 
-@implementation STHTTPRequestTests
+@implementation HMHTTPRequestTests
 
 - (void)setUp {
     [super setUp];
         
     // Set-up code here.
 
-    [STHTTPRequestTestResponseQueue sharedInstance].responses = [NSMutableArray array];
+    [HMHTTPRequestTestResponseQueue sharedInstance].responses = [NSMutableArray array];
 }
 
 - (void)tearDown {
     // Tear-down code here.
     
-    NSUInteger numberOfReponsesLeft = [[STHTTPRequestTestResponseQueue sharedInstance].responses count];
+    NSUInteger numberOfReponsesLeft = [[HMHTTPRequestTestResponseQueue sharedInstance].responses count];
     
     XCTAssertTrue(numberOfReponsesLeft == 0, @"still %@ responses in queue", @(numberOfReponsesLeft));
 
@@ -41,9 +41,9 @@
 
 - (void)testExample {
     
-    STHTTPRequestTestResponseQueue *queue = [STHTTPRequestTestResponseQueue sharedInstance];
+    HMHTTPRequestTestResponseQueue *queue = [HMHTTPRequestTestResponseQueue sharedInstance];
 
-    STHTTPRequestTestResponse *tr = [STHTTPRequestTestResponse testResponseWithBlock:^(STHTTPRequest *r) {
+    HMHTTPRequestTestResponse *tr = [HMHTTPRequestTestResponse testResponseWithBlock:^(HMHTTPRequest *r) {
         r.responseStatus = 200; // by default
         r.responseHeaders = @{ @"key" : @"value" };
         r.responseString = @"OK";
@@ -55,7 +55,7 @@
     
     /**/
     
-    STHTTPRequest *r = [STHTTPRequest requestWithURLString:@"http://www.google.com"];
+    HMHTTPRequest *r = [HMHTTPRequest requestWithURLString:@"http://www.google.com"];
     
     r.completionBlock = ^(NSDictionary *headers, NSString *responseString) {
         // use response
@@ -75,7 +75,7 @@
 
 - (void)testStreaming {
     
-    STHTTPRequest *r = [STHTTPRequest requestWithURLString:@"http://www.google.com"];
+    HMHTTPRequest *r = [HMHTTPRequest requestWithURLString:@"http://www.google.com"];
     
     r.downloadProgressBlock = ^(NSData *data, NSUInteger totalBytesReceived, long long totalBytesExpectedToReceive) {
         NSLog(@"-- %@", data);
@@ -99,7 +99,7 @@
     
     NSDictionary *d = @{@"a":@"1", @"c":@"1"};
     
-    NSString *s2 = [s st_stringByAppendingGETParameters:d];
+    NSString *s2 = [s hm_stringByAppendingGETParameters:d];
     
     XCTAssertTrue(s2, @"http://www.test.com/x?b=1&a=1&c=1");
 }

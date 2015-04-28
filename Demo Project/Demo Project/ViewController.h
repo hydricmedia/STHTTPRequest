@@ -1,6 +1,6 @@
 //
 //  ViewController.h
-//  STHTTPRequestDemo
+//  HMHTTPRequestDemo
 //
 //  Created by Nicolas Seriot on 8/10/12.
 //  Copyright (c) 2012 Nicolas Seriot. All rights reserved.

@@ -1,13 +1,13 @@
 //
-//  STHTTPRequest+UnitTests.m
+//  HMHTTPRequest+UnitTests.m
 //
 //  Created by Nicolas Seriot on 8/8/12.
 //
 //
 
-#import "STHTTPRequest+UnitTests.h"
-#import "STHTTPRequestTestResponse.h"
-#import "STHTTPRequestTestResponseQueue.h"
+#import "HMHTTPRequest+UnitTests.h"
+#import "HMHTTPRequestTestResponse.h"
+#import "HMHTTPRequestTestResponseQueue.h"
 
 #import <objc/runtime.h>
 #import <objc/message.h>
@@ -21,7 +21,7 @@ void Swizzle(Class c, SEL orig, SEL new) {
         method_exchangeImplementations(origMethod, newMethod);
 }
 
-@implementation STHTTPRequest (UnitTests)
+@implementation HMHTTPRequest (UnitTests)
 
 @dynamic responseStatus;
 @dynamic responseString;
@@ -30,15 +30,15 @@ void Swizzle(Class c, SEL orig, SEL new) {
 @dynamic error;
 
 + (void)initialize {
-    Swizzle([STHTTPRequest class], @selector(startAsynchronous), @selector(unitTests_startAsynchronous));
-    Swizzle([STHTTPRequest class], @selector(unitTests_startSynchronousWithError:), @selector(startSynchronousWithError:));
+    Swizzle([HMHTTPRequest class], @selector(startAsynchronous), @selector(unitTests_startAsynchronous));
+    Swizzle([HMHTTPRequest class], @selector(unitTests_startSynchronousWithError:), @selector(startSynchronousWithError:));
 }
 
 - (void)unitTests_startAsynchronous {
     
     NSAssert(self.errorBlock != nil, @"errorBlock needed");
     
-    STHTTPRequestTestResponse *tr = [[STHTTPRequestTestResponseQueue sharedInstance] dequeue];
+    HMHTTPRequestTestResponse *tr = [[HMHTTPRequestTestResponseQueue sharedInstance] dequeue];
 
     if(tr == nil && self.downloadProgressBlock) {
         return; // response may come later on
@@ -63,7 +63,7 @@ void Swizzle(Class c, SEL orig, SEL new) {
 
 - (NSString *)unitTests_startSynchronousWithError:(NSError **)error {
     
-    STHTTPRequestTestResponse *tr = [[STHTTPRequestTestResponseQueue sharedInstance] dequeue];
+    HMHTTPRequestTestResponse *tr = [[HMHTTPRequestTestResponseQueue sharedInstance] dequeue];
 
     if(tr == nil && self.downloadProgressBlock) {
         return nil; // response may come later on

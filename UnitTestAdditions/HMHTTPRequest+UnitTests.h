@@ -1,13 +1,13 @@
 //
-//  STHTTPRequest+UnitTests.h
+//  HMHTTPRequest+UnitTests.h
 //
 //  Created by Nicolas Seriot on 8/8/12.
 //
 //
 
-#import "STHTTPRequest.h"
+#import "HMHTTPRequest.h"
 
-@interface STHTTPRequest (UnitTests)
+@interface HMHTTPRequest (UnitTests)
 
 // expose private properties
 @property (nonatomic) NSUInteger responseStatus;

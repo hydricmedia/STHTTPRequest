@@ -1,4 +1,4 @@
-### STHTTPRequest
+### HMHTTPRequest
 
 _A NSURLConnection wrapper for humans_
 
@@ -7,7 +7,7 @@ _A NSURLConnection wrapper for humans_
 -   900 lines of Objective-C you can understand
 -   runs on iOS 5+ and Mac OS X 10.7+
 -   just drag and drop .h and .m in your project
--   pod 'STHTTPRequest' in CocoaPods
+-   pod 'HMHTTPRequest' in CocoaPods
 -   new BSD license
 
 ##### ... yet powerful
@@ -22,14 +22,14 @@ _A NSURLConnection wrapper for humans_
 
 ##### Maturity
 
-STHTTPRequest is used in many applications available on the App Store and used by 100'000+ regular users.
+HMHTTPRequest is used in many applications available on the App Store and used by 100'000+ regular users.
 
-STHTTPRequest is also used in the [STTwitter library](https://github.com/nst/STTwitter), the main Objective-C library to access Twitter API.
+HMHTTPRequest is also used in the [STTwitter library](https://github.com/nst/STTwitter), the main Objective-C library to access Twitter API.
 
 ##### Typical usage
 
 ```Objective-C
-STHTTPRequest *r = [STHTTPRequest requestWithURLString:@"http://google.com"];
+HMHTTPRequest *r = [HMHTTPRequest requestWithURLString:@"http://google.com"];
 
 r.completionBlock = ^(NSDictionary *headers, NSString *body) {
     // ...
@@ -44,7 +44,7 @@ r.errorBlock = ^(NSError *error) {
 
 Notes:
 
-- STHTTPRequest must be used from the main thread
+- HMHTTPRequest must be used from the main thread
 - all blocks are guaranteed to be called on main thread
 
 ##### Start a synchronous request
@@ -144,13 +144,13 @@ r.downloadProgressBlock = ^(NSData *dataJustReceived,
 
 The demo project comes with two unit tests target.
 
-`AsynchronousTests` shows how to [perform actual network requests](https://github.com/nst/STHTTPRequest/blob/master/Demo%20Project/Unit%20Tests/STHTTPRequestAsyncTests.m) in unit tests.
+`AsynchronousTests` shows how to [perform actual network requests](https://github.com/nst/HMHTTPRequest/blob/master/Demo%20Project/Unit%20Tests/HMHTTPRequestAsyncTests.m) in unit tests.
 
-`STHTTPRequestTests` show how to perform synchronous tests by [filling a queue](https://github.com/nst/STHTTPRequest/blob/master/Demo%20Project/Unit%20Tests/STHTTPRequestTests.m#L42-L74) with fake responses to be consumed by requests started from unit tests. Just include the [UnitTestAdditions](https://github.com/nst/STHTTPRequest/tree/master/Demo%20Project/Unit%20Tests) directory to your project.
+`HMHTTPRequestTests` show how to perform synchronous tests by [filling a queue](https://github.com/nst/HMHTTPRequest/blob/master/Demo%20Project/Unit%20Tests/HMHTTPRequestTests.m#L42-L74) with fake responses to be consumed by requests started from unit tests. Just include the [UnitTestAdditions](https://github.com/nst/HMHTTPRequest/tree/master/Demo%20Project/Unit%20Tests) directory to your project.
 
 ##### Log the requests
 
-To log human readable debug description, add launch argument `-STHTTPRequestShowDebugDescription 1`.
+To log human readable debug description, add launch argument `-HMHTTPRequestShowDebugDescription 1`.
 
     GET https://raw.github.com/github/media/master/octocats/octocat.png
     HEADERS
@@ -159,7 +159,7 @@ To log human readable debug description, add launch argument `-STHTTPRequestShow
         asd = sdf
         xxx = yyy
 
-To log curl description, add launch argument `-STHTTPRequestShowCurlDescription 1`.
+To log curl description, add launch argument `-HMHTTPRequestShowCurlDescription 1`.
 
     $ curl -i \
     -b "asd=sdf;xxx=yyy" \
@@ -170,7 +170,7 @@ To log curl description, add launch argument `-STHTTPRequestShowCurlDescription 
 
 ##### Support
 
-If you have any question, [open an issue](https://github.com/nst/STHTTPRequest/issues/new) on GitHub or use the [STHTTPRequest tag](http://stackoverflow.com/questions/tagged/sthttprequest) on StackOverflow.
+If you have any question, [open an issue](https://github.com/nst/HMHTTPRequest/issues/new) on GitHub or use the [HMHTTPRequest tag](http://stackoverflow.com/questions/tagged/sthttprequest) on StackOverflow.
 
 ##### BSD 3-Clause License
 

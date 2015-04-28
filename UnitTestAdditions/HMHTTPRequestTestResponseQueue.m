@@ -1,12 +1,12 @@
-#import "STHTTPRequestTestResponseQueue.h"
-#import "STHTTPRequestTestResponse.h"
+#import "HMHTTPRequestTestResponseQueue.h"
+#import "HMHTTPRequestTestResponse.h"
 
-static STHTTPRequestTestResponseQueue *sharedInstance = nil;
+static HMHTTPRequestTestResponseQueue *sharedInstance = nil;
 
-@implementation STHTTPRequestTestResponseQueue
+@implementation HMHTTPRequestTestResponseQueue
 
 + (instancetype)sharedInstance {
-    static STHTTPRequestTestResponseQueue *sharedInstance = nil;
+    static HMHTTPRequestTestResponseQueue *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[self alloc] init];
@@ -22,13 +22,13 @@ static STHTTPRequestTestResponseQueue *sharedInstance = nil;
 
 /**/
 
-- (void)enqueue:(STHTTPRequestTestResponse *)response {
+- (void)enqueue:(HMHTTPRequestTestResponse *)response {
     NSAssert(response != nil, @"can't enqueue nil");
 
     [_responses insertObject:response atIndex:0];
 }
 
-- (STHTTPRequestTestResponse *)dequeue {
+- (HMHTTPRequestTestResponse *)dequeue {
     
     if([_responses count] == 0) {
         NSLog(@"Cannot dequeue response");
@@ -37,7 +37,7 @@ static STHTTPRequestTestResponseQueue *sharedInstance = nil;
     
     NSUInteger lastIndex = [_responses count] - 1;
     
-    STHTTPRequestTestResponse *response = [_responses objectAtIndex:lastIndex];
+    HMHTTPRequestTestResponse *response = [_responses objectAtIndex:lastIndex];
     
     [_responses removeObjectAtIndex:lastIndex];
     
